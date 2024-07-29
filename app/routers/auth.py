@@ -19,7 +19,7 @@ async def post_token(
     async with await db_connection_pool.get_connection() as db_conn:
         try:
             authenticated = await auth_util.authenticate_user(db_conn, login_request.email, login_request.password)
-        except InvalidPassword:
+        except InvalidPassword as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Invalid username or password',
