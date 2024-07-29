@@ -13,5 +13,5 @@ async def get_user_password(db_conn: AsyncConnectionPool, email: str) -> str:
         args = (email,)
         await cur.execute(stmt, args)
         hashed_password = (await cur.fetchone())[0]
-        print(hashed_password)
+
     return hashed_password

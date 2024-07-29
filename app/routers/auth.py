@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
+
+from app.exceptions import InvalidPassword
 from app.models.login_request import LoginRequest
 from app.models.token import Token
 from app.utils import db_connection_pool, jwt_util, auth_util
@@ -15,7 +17,15 @@ async def post_token(
         login_request: LoginRequest,
 ) -> Token:
     async with await db_connection_pool.get_connection() as db_conn:
-        authenticated = await auth_util.authenticate_user(db_conn, login_request.email, login_request.password)
+        try:
+            authenticated = await auth_util.authenticate_user(db_conn, login_request.email, login_request.password)
+        except InvalidPassword:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid username or password',
+                headers={'WWW-Authenticate': 'Bearer'}
+            )
+
         if not authenticated:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

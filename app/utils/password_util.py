@@ -1,7 +1,8 @@
 import argon2
 
 from argon2 import PasswordHasher
-
+from argon2.exceptions import VerifyMismatchError
+from app.exceptions import InvalidPassword
 
 # https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 # https://argon2-cffi.readthedocs.io/en/stable/api.html
@@ -21,5 +22,9 @@ def hash_password(plain_password):
 
 
 def verify_password(plain_password, verified_hash):
-    return password_hasher.verify(verified_hash, plain_password)
+    try:
+        return password_hasher.verify(verified_hash, plain_password)
+    except VerifyMismatchError:
+        raise InvalidPassword
+
 

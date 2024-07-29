@@ -40,8 +40,8 @@ def _parse_token_helper(token):
 
 def create_access_token(
         email: str,
-        user_id: str,
-        expires_delta: timedelta | None = None,
+        user_id: UUID,
+        expires_delta: timedelta | None = None
 ):
     """
     Creates a JWT access token
