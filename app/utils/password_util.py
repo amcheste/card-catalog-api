@@ -23,12 +23,3 @@ def hash_password(plain_password):
 def verify_password(plain_password, verified_hash):
     return password_hasher.verify(verified_hash, plain_password)
 
-
-async def get_user_password(db_conn, email):
-    async with db_conn.cursor() as cur:
-        await cur.execute(
-            'SELECT password FROM users WHERE users.email = %s',
-            (email,)
-        );
-        hashed_password = (await cur.fetchone())[0]
-    return hashed_password
