@@ -10,7 +10,7 @@ remove-image:
 	docker image rm $(PROGRAM):$(LABEL)
 
 run-docker:
-	docker run -it --rm -p 8000:8000 $(PROGRAM):$(LABEL)
+	docker run -it --rm  -p 8000:8000 $(PROGRAM):$(LABEL)
 
 get-shell:
 	docker run -it --rm --entrypoint sh $(PROGRAM):$(LABEL)
