@@ -1,15 +1,28 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from app.models.login_request import LoginRequest
 from app.models.token import Token
-
+from app.utils import db_connection_pool, jwt_util, auth_util
+from app.daos import users_dao
 
 router = APIRouter(
     prefix='/v1/users',
     tags=["users"]
 )
 
+
 @router.post('/login')
 async def post_token(
-    login_request: LoginRequest,
+        login_request: LoginRequest,
 ) -> Token:
-    pass
+    async with await db_connection_pool.get_connection() as db_conn:
+        authenticated = await auth_util.authenticate_user(db_conn, login_request.email, login_request.password)
+        if not authenticated:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid username or password',
+                headers={'WWW-Authenticate': 'Bearer'}
+            )
+        # Generate access token
+        user = await users_dao.get_user_by_email(db_conn, login_request.email)
+        access_token = jwt_util.create_access_token(user.email, user.id)
+        return Token(access_token=access_token, token_type='bearer')

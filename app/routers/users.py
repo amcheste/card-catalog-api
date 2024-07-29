@@ -35,6 +35,7 @@ async def create_user(user_req: SignUpRequest):
 
 @router.put("/", summary="Update user account", response_model=User, status_code=status.HTTP_200_OK)
 async def update_user(user: UserRequest):
+    # TODO: Auth
     async with await db_connection_pool.get_connection() as db_conn:
         user = await users_dao.update_user(db_conn, user)
 
