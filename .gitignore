@@ -2,3 +2,6 @@
 app/__pycache__
 app/models/__pycache__
 app/routers/__pycache__
+app/daos/__pycache__
+app/utils/__pycache__
+app/exceptions/__pycache__
