@@ -1,8 +1,10 @@
+
 from fastapi import APIRouter, status, Header, Response, HTTPException
 from typing import List, Annotated
 from app.models import User, UserRequest, SignUpRequest, Token
 from app.utils import db_connection_pool, jwt_util
 from app.daos import users_dao
+
 
 """
     Create a router object for user API endpoints
@@ -31,6 +33,7 @@ async def create_user(user_req: SignUpRequest):
     async with await db_connection_pool.get_connection() as db_conn:
         user = await users_dao.create_user(db_conn, user_req)
     return user
+
 
 
 @router.put("/", summary="Update user account", response_model=User, status_code=status.HTTP_200_OK)

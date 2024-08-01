@@ -1,4 +1,5 @@
 from copy import deepcopy
+
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, EmailStr
@@ -39,3 +40,4 @@ class UserRequest(BaseModel):
             time_created=time_created,
             time_modified=time_modified
         )
+
