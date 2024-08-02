@@ -6,12 +6,10 @@ from app.models.token import Token
 from app.utils import db_connection_pool, jwt_util, auth_util
 from app.daos import users_dao
 
-
 router = APIRouter(
     prefix='/v1/users',
     tags=["users"]
 )
-
 
 
 @router.post('/login')
@@ -38,4 +36,3 @@ async def post_token(
         user = await users_dao.get_user_by_email(db_conn, login_request.email)
         access_token = jwt_util.create_access_token(user.email, user.id)
         return Token(access_token=access_token, token_type='bearer')
-

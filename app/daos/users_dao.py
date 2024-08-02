@@ -4,7 +4,7 @@ from psycopg.rows import class_row
 from psycopg_pool import AsyncConnectionPool
 
 from app.utils import password_util
-from app.models import User, SignUpRequest, UserRequest, Status
+from app.models import User, SignUpRequest, Status
 
 
 async def create_user(db_conn: AsyncConnectionPool, user: SignUpRequest) -> User:
@@ -49,8 +49,4 @@ async def get_user_by_email(db_conn: AsyncConnectionPool, email: str) -> User:
         )
         user = await cur.fetchone()
     return user
-    pass
-
-
-async def update_user(db_conn: AsyncConnectionPool, user: UserRequest) -> User:
     pass
