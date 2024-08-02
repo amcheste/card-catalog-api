@@ -25,6 +25,4 @@ def verify_password(plain_password, verified_hash):
     try:
         return password_hasher.verify(verified_hash, plain_password)
     except VerifyMismatchError:
-        raise InvalidPassword
-
-
+        raise InvalidPassword("Invalid Password")

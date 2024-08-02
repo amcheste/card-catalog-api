@@ -5,3 +5,4 @@ app/routers/__pycache__
 app/daos/__pycache__
 app/utils/__pycache__
 app/exceptions/__pycache__
+tests/__pycache__/

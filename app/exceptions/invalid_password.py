@@ -1,4 +1,4 @@
-class InvalidPassword(BaseException):
+class InvalidPassword(Exception):
     """
         Exception which is used to represent an invalid password
     """

@@ -1,4 +1,5 @@
 from psycopg_pool import AsyncConnectionPool
+from app.exceptions import UserNotFound
 
 
 async def get_user_password(db_conn: AsyncConnectionPool, email: str) -> str:
@@ -12,6 +13,9 @@ async def get_user_password(db_conn: AsyncConnectionPool, email: str) -> str:
         '''
         args = (email,)
         await cur.execute(stmt, args)
-        hashed_password = (await cur.fetchone())[0]
+        ret = await cur.fetchone()
+        if ret is None:
+            raise UserNotFound(f"User: {email} does not exist")
+        hashed_password = ret[0]
 
     return hashed_password

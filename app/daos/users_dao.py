@@ -49,4 +49,3 @@ async def get_user_by_email(db_conn: AsyncConnectionPool, email: str) -> User:
         )
         user = await cur.fetchone()
     return user
-    pass

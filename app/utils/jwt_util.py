@@ -4,6 +4,7 @@ from datetime import datetime, timezone, timedelta
 from uuid import UUID
 from app.models import Token, User
 from app.daos import users_dao
+from app.exceptions import UserNotFound, InvalidToken
 
 # TODO: Create better/secure secret, load secret key from a file
 SECRET_KEY = 'secret'
@@ -28,6 +29,7 @@ def _jwt_decode(token):
     """
     global SECRET_KEY
     global ALGORITHM
+
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
 
@@ -94,28 +96,30 @@ def authenticate_access_token_get_subject(token: str) -> (bool, dict | None):
 async def authenticate_access_token_and_user(
         db_conn,
         token: Token,
-) -> (bool, User | None):
+) -> User:
     """
     Authenticates this token was signed by us and maps to a valid user
     """
+
+    token = _parse_token_helper(token)
     try:
-        token = _parse_token_helper(token)
         payload = _jwt_decode(token)
-        jwt_sub = payload['sub']
-        email, user_id = jwt_sub.split('|', 1)
-        user_id = UUID(user_id)
-        user = await users_dao.get_user_by_email(db_conn, email)
-        if user is None:
-            # Provided email is not a user
-            return False, None
-        if user.email != email:
-            # This should not be possible since the user is gotten based on the email, but check it anyway
-            return False, None
-        if user.id != user_id:
-            # JWT user id and DB user id mismatch
-            return False, None
-        # JWT token subject matches the user
-        return True, user
-    except:
-        pass
-    return False, None
+    except  jwt.exceptions.DecodeError:
+        raise InvalidToken("Failed to decode token")
+    jwt_sub = payload['sub']
+    email, user_id = jwt_sub.split('|', 1)
+    user_id = UUID(user_id)
+
+    user = await users_dao.get_user_by_email(db_conn, email)
+    if user is None:
+        # Provided email is not a user
+        raise UserNotFound(f"User: {email} does not exist")
+    if user.email != email:
+        # This should not be possible since the user is gotten based on the email, but check it anyway
+        raise InvalidToken("Email mismatch")
+    if user.id != user_id:
+        # JWT user id and DB user id mismatch
+        raise InvalidToken("User id mismatch")
+    # JWT token subject matches the user
+    return user
+

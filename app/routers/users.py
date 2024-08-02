@@ -3,6 +3,7 @@ from typing import Annotated
 from app.models import User, SignUpRequest
 from app.utils import db_connection_pool, jwt_util
 from app.daos import users_dao
+from app.exceptions import InvalidToken
 
 """
     Create a router object for user API endpoints
@@ -18,8 +19,9 @@ async def get_user(
     token: Annotated[str, Header(alias='Authorization')]
 ):
     async with await db_connection_pool.get_connection() as db_conn:
-        authenticated, user = await jwt_util.authenticate_access_token_and_user(db_conn, token)
-        if not authenticated:
+        try:
+            user = await jwt_util.authenticate_access_token_and_user(db_conn, token)
+        except InvalidToken:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Invalid username or password',
